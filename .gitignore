@@ -2,3 +2,10 @@ data/
 trained_model/
 __pycache__/
 *.pyc
+logs/
+log/
+*.log
+blender*
+expansion_penalty/
+emd/
+MDS/

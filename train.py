@@ -11,14 +11,14 @@ from utils import *
 import os
 import json
 import time, datetime
-import visdom
+# import visdom
 from time import time
 sys.path.append("./emd/")
 import emd_module as emd
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--batchSize', type=int, default=3, help='input batch size')
-parser.add_argument('--workers', type=int, help='number of data loading workers', default=1)
+parser.add_argument('--batchSize', type=int, default=10, help='input batch size')
+parser.add_argument('--workers', type=int, help='number of data loading workers', default=12)
 parser.add_argument('--nepoch', type=int, default=25, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default = '',  help='optional reload model path')
 parser.add_argument('--num_points', type=int, default = 8192,  help='number of points')
@@ -46,7 +46,7 @@ class FullModel(nn.Module):
 
         return output1, output2, emd1, emd2, expansion_penalty
 
-vis = visdom.Visdom(port = 8097, env=opt.env) # set your port
+# vis = visdom.Visdom(port = 8097, env=opt.env) # set your port
 now = datetime.datetime.now()
 save_path = now.isoformat()
 if not os.path.exists('./log/'):
@@ -128,35 +128,35 @@ for epoch in range(opt.nepoch):
 
         if i % 10 == 0:
             idx = random.randint(0, input.size()[0] - 1)
-            vis.scatter(X = gt.contiguous()[idx].data.cpu()[:, :3],
-                    win = 'TRAIN_GT',
-                    opts = dict(
-                        title = id[idx],
-                        markersize = 2,
-                        ),
-                    )
-            vis.scatter(X = input.transpose(2,1).contiguous()[idx].data.cpu(),
-                    win = 'TRAIN_INPUT',
-                    opts = dict(
-                        title = id[idx],
-                        markersize = 2,
-                        ),
-                    )
-            vis.scatter(X = output1[idx].data.cpu(),
-                    Y = labels_generated_points[0:output1.size(1)],
-                    win = 'TRAIN_COARSE',
-                    opts = dict(
-                        title= id[idx],
-                        markersize=2,
-                        ),
-                    )
-            vis.scatter(X = output2[idx].data.cpu(),
-                    win = 'TRAIN_OUTPUT',
-                    opts = dict(
-                        title= id[idx],
-                        markersize=2,
-                        ),
-                    )
+            # vis.scatter(X = gt.contiguous()[idx].data.cpu()[:, :3],
+            #         win = 'TRAIN_GT',
+            #         opts = dict(
+            #             title = id[idx],
+            #             markersize = 2,
+            #             ),
+            #         )
+            # vis.scatter(X = input.transpose(2,1).contiguous()[idx].data.cpu(),
+            #         win = 'TRAIN_INPUT',
+            #         opts = dict(
+            #             title = id[idx],
+            #             markersize = 2,
+            #             ),
+            #         )
+            # vis.scatter(X = output1[idx].data.cpu(),
+            #         Y = labels_generated_points[0:output1.size(1)],
+            #         win = 'TRAIN_COARSE',
+            #         opts = dict(
+            #             title= id[idx],
+            #             markersize=2,
+            #             ),
+            #         )
+            # vis.scatter(X = output2[idx].data.cpu(),
+            #         win = 'TRAIN_OUTPUT',
+            #         opts = dict(
+            #             title= id[idx],
+            #             markersize=2,
+            #             ),
+            #         )
 
         print(opt.env + ' train [%d: %d/%d]  emd1: %f emd2: %f expansion_penalty: %f' %(epoch, i, len_dataset/opt.batchSize, emd1.mean().item(), emd2.mean().item(), expansion_penalty.mean().item()))
     train_curve.append(train_loss.avg)
@@ -174,47 +174,47 @@ for epoch in range(opt.nepoch):
                 output1, output2, emd1, emd2, expansion_penalty  = network(input, gt.contiguous(), 0.004, 3000)
                 val_loss.update(emd2.mean().item())
                 idx = random.randint(0, input.size()[0] - 1)
-                vis.scatter(X = gt.contiguous()[idx].data.cpu()[:, :3],
-                        win = 'VAL_GT',
-                        opts = dict(
-                            title = id[idx],
-                            markersize = 2,
-                            ),
-                        )
-                vis.scatter(X = input.transpose(2,1).contiguous()[idx].data.cpu(),
-                        win = 'VAL_INPUT',
-                        opts = dict(
-                            title = id[idx],
-                            markersize = 2,
-                            ),
-                        )
-                vis.scatter(X = output1[idx].data.cpu(),
-                        Y = labels_generated_points[0:output1.size(1)],
-                        win = 'VAL_COARSE',
-                        opts = dict(
-                            title= id[idx],
-                            markersize=2,
-                            ),
-                        )
-                vis.scatter(X = output2[idx].data.cpu(),
-                        win = 'VAL_OUTPUT',
-                        opts = dict(
-                            title= id[idx],
-                            markersize=2,
-                            ),
-                        )
+                # vis.scatter(X = gt.contiguous()[idx].data.cpu()[:, :3],
+                #         win = 'VAL_GT',
+                #         opts = dict(
+                #             title = id[idx],
+                #             markersize = 2,
+                #             ),
+                #         )
+                # vis.scatter(X = input.transpose(2,1).contiguous()[idx].data.cpu(),
+                #         win = 'VAL_INPUT',
+                #         opts = dict(
+                #             title = id[idx],
+                #             markersize = 2,
+                #             ),
+                #         )
+                # vis.scatter(X = output1[idx].data.cpu(),
+                #         Y = labels_generated_points[0:output1.size(1)],
+                #         win = 'VAL_COARSE',
+                #         opts = dict(
+                #             title= id[idx],
+                #             markersize=2,
+                #             ),
+                #         )
+                # vis.scatter(X = output2[idx].data.cpu(),
+                #         win = 'VAL_OUTPUT',
+                #         opts = dict(
+                #             title= id[idx],
+                #             markersize=2,
+                #             ),
+                #         )
                 print(opt.env + ' val [%d: %d/%d]  emd1: %f emd2: %f expansion_penalty: %f' %(epoch, i, len_dataset/opt.batchSize, emd1.mean().item(), emd2.mean().item(), expansion_penalty.mean().item()))
 
     val_curve.append(val_loss.avg)
 
-    vis.line(X=np.column_stack((np.arange(len(train_curve)),np.arange(len(val_curve)))),
-                 Y=np.column_stack((np.array(train_curve),np.array(val_curve))),
-                 win='loss',
-                 opts=dict(title="emd", legend=["train_curve" + opt.env, "val_curve" + opt.env], markersize=2, ), )
-    vis.line(X=np.column_stack((np.arange(len(train_curve)),np.arange(len(val_curve)))),
-                 Y=np.log(np.column_stack((np.array(train_curve),np.array(val_curve)))),
-                 win='log',
-                 opts=dict(title="log_emd", legend=["train_curve"+ opt.env, "val_curve"+ opt.env], markersize=2, ), )
+    # vis.line(X=np.column_stack((np.arange(len(train_curve)),np.arange(len(val_curve)))),
+    #              Y=np.column_stack((np.array(train_curve),np.array(val_curve))),
+    #              win='loss',
+    #              opts=dict(title="emd", legend=["train_curve" + opt.env, "val_curve" + opt.env], markersize=2, ), )
+    # vis.line(X=np.column_stack((np.arange(len(train_curve)),np.arange(len(val_curve)))),
+    #              Y=np.log(np.column_stack((np.array(train_curve),np.array(val_curve)))),
+    #              win='log',
+    #              opts=dict(title="log_emd", legend=["train_curve"+ opt.env, "val_curve"+ opt.env], markersize=2, ), )
 
     log_table = {
       "train_loss" : train_loss.avg,
@@ -228,4 +228,4 @@ for epoch in range(opt.nepoch):
         f.write('json_stats: ' + json.dumps(log_table) + '\n')
 
     print('saving net...')
-    torch.save(network.module.model.state_dict(), f'{dir_name}/network_soft_pool_{epoch}.pth')
+    torch.save(network.module.model.state_dict(), f'{dir_name}/network_soft_skip_{epoch}.pth')

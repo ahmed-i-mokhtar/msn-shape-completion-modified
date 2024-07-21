@@ -5,6 +5,7 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 import os
 import random
+import glob
 #from utils import *
 
 def resample_pcd(pcd, n):
@@ -49,32 +50,38 @@ class ShapeNet(data.Dataset):
 class Future3D(data.Dataset): 
     def __init__(self, train = True, npoints = 8192):
         if train:
-            self.list_path = './data/3D-FUTURE-model-train.list'
+            self.list_path = '/home/stud/ahah/storage/slurm/cvai/3D-FUTURE/3D-FUTURE-model-train.txt'
         else:
-            self.list_path = './data/3D-FUTURE-model-val.list'
+            self.list_path = '/home/stud/ahah/storage/slurm/cvai/3D-FUTURE/3D-FUTURE-model-val.txt'
         self.npoints = npoints
         self.train = train
 
         with open(os.path.join(self.list_path)) as file:
-            self.model_list = [line.strip() for line in file]
+            model_list = [line.strip() for line in file]
+        
+        complete_files = glob.glob("/home/stud/ahah/storage/slurm/cvai/3D-FUTURE/complete/*")
+        
+        filtered_model_list = []
+        for model in model_list:
+            if "/home/stud/ahah/storage/slurm/cvai/3D-FUTURE/complete/00000001-"+model+".pcd" in complete_files:
+                filtered_model_list.append(model)
+            
+        self.model_list = filtered_model_list
         random.shuffle(self.model_list)
-        self.len = len(self.model_list * 5)
+        self.len = len(self.model_list * 20)
 
     def __getitem__(self, index):
-        model_id = self.model_list[index // 5]
-        scan_id = index % 5
+        model_id = self.model_list[index // 20]
+        scan_id = index % 20
         def read_pcd(filename):
             pcd = o3d.io.read_point_cloud(filename)
             return torch.from_numpy(np.array(pcd.points)).float()
         if self.train:
-            partial = read_pcd(os.path.join("./data/3D-FUTURE-model-train/", model_id + '_%d.pcd' % scan_id))
+            partial = read_pcd(os.path.join("/home/stud/ahah/storage/slurm/cvai/3D-FUTURE/partial", model_id + '/%d.pcd' % scan_id))
         else:
-            partial = read_pcd(os.path.join("./data/3D-FUTURE-model-val/", model_id + '_%d.pcd' % scan_id))
-        complete = read_pcd(os.path.join("./data/3D-FUTURE-model-complete/", '%s.pcd' % model_id))
+            partial = read_pcd(os.path.join("/home/stud/ahah/storage/slurm/cvai/3D-FUTURE/partial", model_id + '/%d.pcd' % scan_id))
+        complete = read_pcd(os.path.join("/home/stud/ahah/storage/slurm/cvai/3D-FUTURE/complete", '00000001-%s.pcd' % model_id))
         
-        #scale points by 0.5
-        partial = partial * 0.5
-        complete = complete * 0.5
         #check if the point cloud is empty
         if partial.shape[0] == 0:
             print('Warning: empty partial point cloud')
