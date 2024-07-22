@@ -3,10 +3,12 @@ import numpy as np
 import glob
 from tqdm import tqdm
 
-inputs = glob.glob("./*/input.pcd")
-outputs = glob.glob("./*/output.pcd")
-coarse_outputs = glob.glob("./*/coarse_output.pcd")
-gt = glob.glob("./*/gt.pcd")
+model = "original"
+
+inputs = glob.glob("./"+model+"/*/input.pcd")
+outputs = glob.glob("./"+model+"/*/output.pcd")
+coarse_outputs = glob.glob("./"+model+"/*/coarse_output.pcd")
+gt = glob.glob("./"+model+"/*/gt.pcd")
 
 for i in range(len(inputs)):
     input = inputs[i]
