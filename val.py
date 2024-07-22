@@ -1,6 +1,6 @@
 import sys
 import open3d as o3d
-from logs.skip.model import *
+from logs.soft.model import *
 from utils import *
 import argparse
 import random
@@ -108,10 +108,10 @@ with torch.no_grad():
         
         
         #create folder in output directory for model
-        if not os.path.exists('./output/skip/' + model):
-            os.makedirs('./output/skip/' + model)
+        if not os.path.exists('./output/soft/' + model):
+            os.makedirs('./output/soft/' + model)
         
-        output_dir = './output/skip/' + model + '/'
+        output_dir = './output/soft/' + model + '/'
         #save to disk coarse point cloud, full output and gt point clouds using open3d
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(output1[idx].data.cpu().numpy())
