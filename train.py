@@ -6,7 +6,7 @@ import torch
 import torch.optim as optim
 import sys
 from dataset import *
-from logs.original.model import *
+from model_original import * # model_soft.py, model_original.py, model_skip.py, model_soft_skip.py
 from utils import *
 import os
 import json
