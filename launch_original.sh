@@ -11,7 +11,7 @@
 
 module load cuda/10.0
 
-/home/stud/ahah/miniconda3/envs/msn/bin/python -u train.py
+/home/stud/ahah/miniconda3/envs/msn/bin/python -u train.py --model /home/stud/ahah/storage/scratch/amokhtar/msn-shape-completion-modified/log/2024-07-20T20:07:01.324677/network_original_19.pth
 
 # watch -n 0.5 'tail -n 2 /storage/scratch/amokhtar/msn-shape-completion-modified/logs/original/slurm-%j.out'
 #2024-07-20T20:07:01.324677

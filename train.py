@@ -6,7 +6,7 @@ import torch
 import torch.optim as optim
 import sys
 from dataset import *
-from model import *
+from logs.original.model import *
 from utils import *
 import os
 import json
@@ -48,16 +48,16 @@ class FullModel(nn.Module):
 
 # vis = visdom.Visdom(port = 8097, env=opt.env) # set your port
 now = datetime.datetime.now()
-save_path = now.isoformat()
+save_path = "2024-07-20T20:07:01.324677" #now.isoformat()
 if not os.path.exists('./log/'):
     os.mkdir('./log/')
 dir_name =  os.path.join('log', save_path)
 if not os.path.exists(dir_name):
     os.mkdir(dir_name)
 logname = os.path.join(dir_name, 'log.txt')
-os.system('cp ./train.py %s' % dir_name)
-os.system('cp ./dataset.py %s' % dir_name)
-os.system('cp ./model.py %s' % dir_name)
+# os.system('cp ./train.py %s' % dir_name)
+# os.system('cp ./dataset.py %s' % dir_name)
+# os.system('cp ./model.py %s' % dir_name)
 
 opt.manualSeed = random.randint(1, 10000) 
 print("Random Seed: ", opt.manualSeed)
@@ -92,7 +92,7 @@ optimizer = optim.Adam(network.module.model.parameters(), lr = lrate)
 train_loss = AverageValueMeter()
 val_loss = AverageValueMeter()
 with open(logname, 'a') as f: #open and append
-        f.write(str(network.module.model) + '\n')
+    f.write(str(network.module.model) + '\n')
 
 
 train_curve = []
@@ -228,4 +228,4 @@ for epoch in range(opt.nepoch):
         f.write('json_stats: ' + json.dumps(log_table) + '\n')
 
     print('saving net...')
-    torch.save(network.module.model.state_dict(), f'{dir_name}/network_soft_skip_{epoch}.pth')
+    torch.save(network.module.model.state_dict(), f'{dir_name}/network_original_{epoch}.pth')
